@@ -1,0 +1,48 @@
+[
+  {
+    "hospitalName":"مستشفى الراجحي",
+    "departments": [
+      {
+        "departmentName":"item1",
+        "subDepartments": [
+          "subDepartment1",
+          "subDepartment2",
+          "subDepartment3",
+          "subDepartment4"
+        ]
+      },
+      {
+        "departmentName": "item2",
+        "subDepartments": [
+          "subDepartment1",
+          "subDepartment2",
+          "subDepartment3",
+          "subDepartment4"
+        ]
+      }
+    ]
+  },
+  {
+    "hospitalName": "مستشفى صحة المرأة",
+    "departments": [
+      {
+        "departmentName": "item1",
+        "subDepartments": [
+          "subDepartment1",
+          "subDepartment2",
+          "subDepartment3",
+          "subDepartment4"
+        ]
+      },
+      {
+        "departmentName": "item2",
+        "subDepartments": [
+          "subDepartment1",
+          "subDepartment2",
+          "subDepartment3",
+          "subDepartment4"
+        ]
+      }
+    ]
+  }
+]
