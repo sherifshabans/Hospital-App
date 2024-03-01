@@ -81,6 +81,7 @@ class MainActivity : ComponentActivity() {
                             state = state,
                             navController = navController,
                             onEvent = viewModel::onEvent,
+                            viewModel=viewModel,
                             context = context,
                             argument = argument
 
@@ -100,9 +101,11 @@ class MainActivity : ComponentActivity() {
                         val argument = navBackStackEntry.arguments?.getString("argument")
 
                         UpdateScreen(
+                        state = state,
                         navController = navController,
                         viewModel= viewModel,
-                        argument=argument
+                        argument=argument,
+                        onEvent = viewModel::onEvent
                         )
                     }
                 }

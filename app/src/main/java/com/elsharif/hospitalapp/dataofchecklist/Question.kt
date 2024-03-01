@@ -11,8 +11,8 @@ import com.google.gson.reflect.TypeToken
 @Entity
 @TypeConverters(ListConverter::class)
 data class Question(
-    val checkList: String,
-    val items: List<Item>,
+    var checkList: String,
+    var items: List<Item>,
     val dateAdded: Long,
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0

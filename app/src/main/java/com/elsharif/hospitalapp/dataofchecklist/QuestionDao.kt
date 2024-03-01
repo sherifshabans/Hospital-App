@@ -20,7 +20,7 @@ interface QuestionDao {
      fun getAllQuestion():Flow<List<Question>>
 
     @Query("SELECT * FROM Question WHERE id = :questionId")
-    fun getQuestionById(questionId: Int): Flow<Question?>
+    fun getQuestionById(questionId: Int): Flow<Question>
 
 
 
