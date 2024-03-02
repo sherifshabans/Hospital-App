@@ -184,14 +184,12 @@ fun UpdateScreen(
 
                                         // Radio buttons for choices
                                         RadioButtonGroup(selectedOptions[index],viewModel ,checkListItem,index, subItem.answer) { selectedOption ->
-                                            viewModel.updateAnswer(question!!, checkListItem, Answer(subItem.question, selectedOption))
+                                            viewModel.updateAnswer(checkListItem, Answer(subItem.question, selectedOption))
+
                                         }
                                     }
                                 }
 
-                                subitems.clear()
-                                subitems.add(Item(checkListItem.title, answers))
-                                question!!.items = subitems
 
                             }
                             // Calculate the sum of selected options

@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
@@ -47,7 +48,7 @@ class MainActivity : ComponentActivity() {
         factoryProducer = {
             object : ViewModelProvider.Factory {
                 override fun<T: ViewModel> create(modelClass: Class<T>): T {
-                    return NotesViewModel(database.dao) as T
+                    return NotesViewModel(database.dao, applicationContext ) as T
                 }
             }
         }
@@ -60,6 +61,7 @@ class MainActivity : ComponentActivity() {
 
             HospitalAppTheme {
 
+
                 val context = LocalContext.current
 
                  CheckData.initList(context)
@@ -67,11 +69,22 @@ class MainActivity : ComponentActivity() {
                val state by viewModel.state.collectAsState()
                 val navController = rememberNavController()
 
+                val loginStatus = viewModel.checkLoginStatus()
+                if (loginStatus) {
+                    navController.navigate("NotesScreen")
+                }
+
                 NavHost(navController= navController, startDestination = "NotesScreen") {
                     composable("NotesScreen") {
                         NotesScreen(
                             state = state,
                             navController = navController,
+                        )
+                    }
+                    composable("LoginScreen") {
+                        LoginScreen(
+                            navController = navController,
+                              viewModel=viewModel
                         )
                     }
                     composable("CheckListScreen/{argument}") {navBackStackEntry->
@@ -114,5 +127,7 @@ class MainActivity : ComponentActivity() {
           //      CheckListScreen(checkListItems)
             }
         }
+
     }
+
 }

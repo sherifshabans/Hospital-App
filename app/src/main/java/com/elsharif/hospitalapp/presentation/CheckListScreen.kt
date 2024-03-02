@@ -44,7 +44,6 @@ import com.elsharif.hospitalapp.dataofchecklist.Question
 import com.elsharif.hospitalapp.test.presentation.NotesEvent
 import com.elsharif.hospitalapp.test.presentation.NotesViewModel
 import com.elsharif.hospitalapp.test.presentation.QuestionState
-import kotlin.math.absoluteValue
 
 /*data class Question(
 val checkList: String,

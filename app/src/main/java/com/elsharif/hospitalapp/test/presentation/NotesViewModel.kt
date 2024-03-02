@@ -1,9 +1,12 @@
 package com.elsharif.hospitalapp.test.presentation
 
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.elsharif.hospitalapp.CheckListItem
+import com.elsharif.hospitalapp.Login
 import com.elsharif.hospitalapp.dataofchecklist.Answer
 import com.elsharif.hospitalapp.dataofchecklist.Item
 
@@ -20,7 +23,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class NotesViewModel(private val dao: QuestionDao) : ViewModel() {
+class NotesViewModel(
+    private val dao: QuestionDao,
+ private val context: Context
+) : ViewModel() {
 
     private val isSortedByDateAdded = MutableStateFlow(true)
     var selectedOptions: MutableMap<String, List<Int>> = mutableMapOf()
@@ -145,20 +151,31 @@ class NotesViewModel(private val dao: QuestionDao) : ViewModel() {
 
 
     fun updateAnswer(checkListItem: Item, answer: Answer) {
-        val answers = _answersMap2.getOrPut(checkListItem) { mutableListOf() }
-        val existingAnswerIndex = answers.indexOfFirst { it.question == answer.question }
+        val subItems = checkListItem.subItems.toMutableList()
+        val existingAnswerIndex = subItems.indexOfFirst { it.question == answer.question }
         if (existingAnswerIndex != -1) {
-            answers[existingAnswerIndex] = answer
+            subItems[existingAnswerIndex] = answer
         } else {
-            answers.add(answer)
+            subItems.add(answer)
+        }
+        checkListItem.subItems = subItems
+
+    }
+    fun updateQuestion(question: Question) {
+        viewModelScope.launch {
+            dao.upsertQuestion(question)
         }
     }
+
+
+
 
 
     private var notes =
         isSortedByDateAdded.flatMapLatest { _ ->
             dao.getAllQuestion()
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
 
     val _state = MutableStateFlow(
         QuestionState(
@@ -213,9 +230,37 @@ class NotesViewModel(private val dao: QuestionDao) : ViewModel() {
     fun getQuestionById(questionId: Int): Flow<Question?> {
         return dao.getQuestionById(questionId)
     }
-    fun updateQuestion(question: Question) {
+
+    private val hospitals = listOf(
+        Login("main hospital", "#main001"),
+        Login("student hospital", "#stud002"),
+        Login("om el-kosor hospital", "#omel003"),
+        Login("traume hospital", "#trau004"),
+        Login("new assiut hospital", "#newa005"),
+        Login("pediatric hospital", "#pedi006"),
+        Login("neurology psychiatry hospital ", "#neps007"),
+        Login("urology hospital", "#urol008"),
+        Login("woman hospital", "#woma009"),
+        Login("cardiology hospital", "#card010"),
+        Login("al raghi  hospital", "#alra011")
+    )
+
+    fun checkLoginStatus(): Boolean {
+        val sharedPreferences = context.getSharedPreferences("login_status", Context.MODE_PRIVATE)
+        return sharedPreferences.getBoolean("logged_in", false)
+    }
+
+    fun login(username: String, password: String, onLoginSuccess: () -> Unit) {
         viewModelScope.launch {
-            dao.upsertQuestion(question)
+            if (hospitals.any { it.name == username && it.password == password }) {
+                setLoginStatus(true)
+                onLoginSuccess()
+            }
         }
+    }
+
+    private fun setLoginStatus(status: Boolean) {
+        val sharedPreferences =  context.getSharedPreferences("login_status", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putBoolean("logged_in", status).apply()
     }
 }

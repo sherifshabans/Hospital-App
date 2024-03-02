@@ -20,7 +20,7 @@ data class Question(
 
 data class Item(
     val title: String,
-    val subItems: List<Answer>
+    var subItems: List<Answer>
 )
 data class Answer(
     val question: String,
