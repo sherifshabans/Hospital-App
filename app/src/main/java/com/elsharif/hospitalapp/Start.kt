@@ -1,5 +1,8 @@
 package com.elsharif.hospitalapp
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -8,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,30 +26,37 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 
 @Composable
-fun DropdownExample():String {
+fun DropdownExample(
+    labelText: String,
+    items: List<String>,
+    paddingValue:PaddingValues
+):Pair<String,String> {
     var expanded by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf("") }
 
-    val CheckListItems = listOf("قسم الطوارئ الاستقبال", "ادارة منع ومكافحة العدوى", "Item 3")
 
-    Column {
-        BasicTextField(
-            value = selectedItem,
-            onValueChange = { selectedItem = it },
-            modifier = Modifier.padding(16.dp)
-        )
+    Row(
+        modifier=Modifier.padding(paddingValue),
+        horizontalArrangement = Arrangement.SpaceBetween
 
+    ) {
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            CheckListItems.forEach { item ->
+            items.forEach { item ->
                 DropdownMenuItem(onClick = {
                     selectedItem = item
                     expanded = false
@@ -53,7 +65,7 @@ fun DropdownExample():String {
                         Text(text = item)
                     }
                 )
-                
+
             }
         }
 
@@ -62,39 +74,108 @@ fun DropdownExample():String {
         ) {
             Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Drop down")
         }
+
+        Text(labelText)
+
     }
-    return selectedItem
+    return selectedItem to labelText
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun StartScreen(
     navController: NavController
 ) {
 
-    Column(
-        modifier = Modifier
+    Scaffold(
+        topBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(55.dp)
+                    .background(MaterialTheme.colorScheme.primary)
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+
+            ) {
+                Text(
+                    text = stringResource(id = R.string.add),
+                    modifier = Modifier.weight(1f),
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        },
+
+        modifier= Modifier
             .fillMaxSize()
-            .padding(10.dp)
-    ) {
+            .background(MaterialTheme.colorScheme.primary)
+        ,
+        content = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)
+            ) {
+                val list1 = listOf(
+                    "قسم الطوارئ و الاستقبال",
+                    "ادارة منع ومكافحة العدوى",
+                    "القسم الداخلي",
+                    "العيادات الخارجيه",
+                    "العناية المركزية",
+                    "وحدة العناية المركزية لحديثي الولادة (المبتسرين)",
+                    "جناح العمليات غرفة الافاقة",
+                    "قائمة المناظير",
+                    "وحدة الغسيل الكلوي",
+                    "الصيدلية الاكلينيكية",
+                    "الاسنان",
+                    "المعمل",
+                    "بنك الدم",
+                    "الاشعة",
+                    "التعقيم",
+                    "المطبخ",
+                    "المغسلة",
+                    "معالجة النفايات",
+                    "المشرحة"
+                )
+                val list2 = listOf("جامعة أسيوط")
 
-        val selectedItem=DropdownExample()
-        Spacer(modifier = Modifier.height(30.dp))
+                val list3 = listOf("المستشفى الرئيسي","مستشفى الاطفال","مستشفى الأعصاب والطب النفسي","مستشفى المسالك البولية"
+                ,"مستشفى المرأة"
+                ,"مستشفى أمراض القلب","مستشفى الراجحي")
+                val selectedItem2 = DropdownExample("اختر اسم الجامعة ", list2,it)
 
+                val selectedItem3 = DropdownExample("اختر اسم المستشفى ", list3,it)
+                val selectedItem = DropdownExample("اختر عنصر التحقيق ", list1,it)
 
-        Button(onClick = {
-
-            navController.navigate("CheckListScreen/$selectedItem")
-
-        } ,modifier= Modifier.fillMaxWidth()) {
-            Text(text = "Done")
-        
-            Text(text = selectedItem)
-        
-        }
-    }
+                Spacer(modifier = Modifier.height(30.dp))
 
 
 
+                Button(onClick = {
+                    if(selectedItem!=null &&selectedItem2!=null&&selectedItem3!=null){
+
+                    navController.navigate(
+                        "CheckListScreen/${
+                            selectedItem.first
+                        }/${
+                            selectedItem2.first
+                        }/${
+                            selectedItem3.first
+                        }"
+                    )
+                    }
+
+                },
+                    modifier = Modifier.fillMaxWidth()) {
+                    Text(text = "التالي")
+
+                }
+            }
+
+
+        })
 }
 /*
 @Composable

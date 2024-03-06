@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">HospitalApp</string>
+    <string name="app_name">IPC M&amp;E</string>
+    <string name="Home">الصفحة الرئيسية</string>
+    <string name="login">تسجيل الدخول</string>
+    <string name="add_task">إضافة جديدة</string>
+    <string name="update_task">تعديل</string>
+    <string name="add">إضافة</string>
 </resources>

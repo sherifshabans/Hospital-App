@@ -19,6 +19,12 @@ interface QuestionDao {
     @Query("SELECT *FROM Question ")
      fun getAllQuestion():Flow<List<Question>>
 
+     @Query("SELECT *FROM Question WHERE priority = 0 ")
+     fun getDefultQuestion():Flow<List<Question>>
+
+     @Query("SELECT *FROM Question WHERE priority = 1 ")
+     fun getCompleteQuestion():Flow<List<Question>>
+
     @Query("SELECT * FROM Question WHERE id = :questionId")
     fun getQuestionById(questionId: Int): Flow<Question>
 

@@ -1,5 +1,6 @@
 package com.elsharif.hospitalapp
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,11 +16,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.elsharif.hospitalapp.dataofchecklist.QuestionDao
 import com.elsharif.hospitalapp.dataofchecklist.QuestionDatabase
 import com.elsharif.hospitalapp.presentation.CheckListScreen
 import com.elsharif.hospitalapp.test.presentation.AddNoteScreen
-import com.elsharif.hospitalapp.test.presentation.NotesScreen
+import com.elsharif.hospitalapp.test.presentation.DefultNotesScreen
+import com.elsharif.hospitalapp.test.presentation.NotesScreenContent
 import com.elsharif.hospitalapp.test.presentation.NotesViewModel
 
 import com.elsharif.hospitalapp.ui.theme.HospitalAppTheme
@@ -41,8 +45,49 @@ class MainActivity : ComponentActivity() {
             applicationContext,
             QuestionDatabase::class.java,
             "question.db"
-        ).build()
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            .build()
     }
+
+    @SuppressLint("Range")
+    private fun checkExistingColumns(database: SupportSQLiteDatabase): Set<String> {
+        val existingColumns = mutableSetOf<String>()
+        database.query("PRAGMA table_info(`Question`)").use {
+            while (it.moveToNext()) {
+                existingColumns.add(it.getString(it.getColumnIndex("name")))
+            }
+        }
+        return existingColumns
+    }
+
+    private val MIGRATION_1_2 = object : Migration(1, 2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            val existingColumns = checkExistingColumns(database)
+
+            if (!existingColumns.contains("name")) {
+                database.execSQL("ALTER TABLE Question ADD COLUMN name TEXT")
+            }
+
+            if (!existingColumns.contains("hospital")) {
+                database.execSQL("ALTER TABLE Question ADD COLUMN hospital TEXT")
+            }
+
+            if (!existingColumns.contains("answer")) {
+                database.execSQL("ALTER TABLE Question ADD COLUMN answer TEXT")
+            }
+        }
+    }
+
+    private val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            val existingColumns = checkExistingColumns(database)
+
+            if (!existingColumns.contains("score")) {
+                database.execSQL("ALTER TABLE Question ADD COLUMN score REAL NOT NULL DEFAULT 0.0")
+            }
+        }
+    }
+
 
     private val viewModel by viewModels<NotesViewModel> (
         factoryProducer = {
@@ -66,20 +111,48 @@ class MainActivity : ComponentActivity() {
 
                  CheckData.initList(context)
 
-               val state by viewModel.state.collectAsState()
+                val state by viewModel.state.collectAsState()
+                val stateDefult by viewModel.stateDefult.collectAsState()
+                val stateCompete by viewModel.stateCompete.collectAsState()
                 val navController = rememberNavController()
 
                 val loginStatus = viewModel.checkLoginStatus()
-                if (loginStatus) {
-                    navController.navigate("NotesScreen")
-                }
 
-                NavHost(navController= navController, startDestination = "NotesScreen") {
-                    composable("NotesScreen") {
+                NavHost(navController= navController, startDestination = if (loginStatus) "HomeScreen" else "LoginScreen") {
+
+                    composable("notes") {
+                        // Pass the necessary parameters to the NotesScreen composable
                         NotesScreen(
                             state = state,
+                            stateDefult=stateDefult,
+                            stateComplete = stateCompete,
                             navController = navController,
+                            viewModel = viewModel, // Initialize your NotesViewModel here
+                            onEvent = viewModel::onEvent
                         )
+                    }
+                    composable("HomeScreen") {
+                        // Pass the necessary parameters to the NotesScreen composable
+                        MainScreen(
+                            navController = navController,
+                            viewModel = viewModel, // Initialize your NotesViewModel here
+                            )
+                    }
+                    composable("DefultNotesScreen") {
+                        DefultNotesScreen(
+                            state = stateDefult,
+                            navController = navController,
+                            viewModel=viewModel,
+                            onEvent = viewModel::onEvent
+                            )
+                    }
+                    composable("NotesScreen") {
+                        NotesScreenContent(
+                            state = stateCompete,
+                            navController = navController,
+                            viewModel=viewModel,
+                            onEvent = viewModel::onEvent
+                            )
                     }
                     composable("LoginScreen") {
                         LoginScreen(
@@ -87,8 +160,12 @@ class MainActivity : ComponentActivity() {
                               viewModel=viewModel
                         )
                     }
-                    composable("CheckListScreen/{argument}") {navBackStackEntry->
+                    ///{argument2}/{argument3}/{argument4}
+                    composable("CheckListScreen/{argument}/{argument2}/{argument3}") {navBackStackEntry->
                         val argument = navBackStackEntry.arguments?.getString("argument")
+                        val argument2 = navBackStackEntry.arguments?.getString("argument2")
+                        val argument3 = navBackStackEntry.arguments?.getString("argument3")
+                        val argument4 = navBackStackEntry.arguments?.getString("argument4")
 
                         CheckListScreen(
                             state = state,
@@ -96,19 +173,16 @@ class MainActivity : ComponentActivity() {
                             onEvent = viewModel::onEvent,
                             viewModel=viewModel,
                             context = context,
-                            argument = argument
+                            argument = argument,
+                            argument2 = argument2,
+                            argument3 = argument3
 
                         )
                     }
                     composable("Start") {
                         StartScreen(
                             navController = navController
-                            /*    state = state,
-                                checkLists = checkListItems,
-                                navController = navController,
-                                onEvent = viewModel::onEvent
-                            */
-                        )
+                         )
                     }
                     composable("update/{argument}") {navBackStackEntry->
                         val argument = navBackStackEntry.arguments?.getString("argument")

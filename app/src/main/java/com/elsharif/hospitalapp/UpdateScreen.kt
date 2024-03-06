@@ -3,6 +3,7 @@ package com.elsharif.hospitalapp
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,9 +39,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.elsharif.hospitalapp.CheckData
 import com.elsharif.hospitalapp.CheckList
@@ -68,6 +71,8 @@ fun UpdateScreen(
     var isExpanded by remember { mutableStateOf(false) }
     //val selectedOptionsMap by viewModel.selectedOptionsMap.collectAsState()
 
+
+
     val selectedOptionsMapState by viewModel.selectedOptionsMapState2.collectAsState()
 
     DisposableEffect(Unit) {
@@ -86,6 +91,18 @@ fun UpdateScreen(
     var question by remember { mutableStateOf<Question?>(null) }
 
 
+    val zero by viewModel.zero.collectAsState()
+    val na by viewModel.na.collectAsState()
+    val one by viewModel.one.collectAsState()
+    val two by viewModel.two.collectAsState()
+    val size by viewModel.size.collectAsState()
+
+    val zeroCounts = mutableListOf<Int>()
+    val oneCounts = mutableListOf<Int>()
+    val twoCounts = mutableListOf<Int>()
+    val naCounts = mutableListOf<Int>()
+    val totalSizes = mutableListOf<Int>()
+
      LaunchedEffect(questionId) {
         if (questionId != -1) {
             viewModel.getQuestionById(questionId).collect { fetchedQuestion ->
@@ -100,19 +117,37 @@ fun UpdateScreen(
     }
 
 
-
-  //  Log.i("Qusetion :  ","Qustion : $question                 Id : $questionId")
-
     Scaffold(
+
+        topBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(55.dp)
+                    .background(MaterialTheme.colorScheme.primary)
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(id = R.string.update_task),
+                    modifier = Modifier.weight(1f),
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        },
+
+
         floatingActionButton = {
+
+
             FloatingActionButton(onClick = {
 
-                /*val question = Question(
-                    checkList = state.checkList.value,
-                    items = state.items.value,
-                    dateAdded = System.currentTimeMillis()
-                // You can replace this with actual date
-                )*/
+
+                if(question!!.priority==1)
+                    question!!.priority=1
+
                 question?.let { updatedQuestion ->
                     viewModel.updateQuestion(updatedQuestion)
                 }
@@ -128,7 +163,9 @@ fun UpdateScreen(
             }
         }
     ) {
-        Column {
+        Column (
+            modifier=Modifier.fillMaxSize().padding(it)
+        ){
             if (question == null) {
                 Text(text = "Not Found")
             } else {
@@ -136,7 +173,7 @@ fun UpdateScreen(
                 LazyColumn {
                     items(question!!.items) { checkListItem ->
 
-                        val selectedOptions = selectedOptionsMapState[checkListItem] ?: List(checkListItem.subItems.size) { -1 }
+                        val selectedOptions = selectedOptionsMapState[checkListItem] ?: List(checkListItem.subItems.size) { "" }
                         val answers = viewModel.getAnswers(checkListItem)
                         var isExpanded by remember { mutableStateOf(false) }
 
@@ -155,7 +192,7 @@ fun UpdateScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "Title: ${checkListItem.title}",
+                                    text = " ${checkListItem.title}",
                                     fontWeight = FontWeight.Bold
                                 )
 
@@ -179,7 +216,7 @@ fun UpdateScreen(
                                             .padding(4.dp)
 
                                     ) {
-                                        Text(text = "${index + 1} : ${subItem.question}", maxLines = 2)
+                                        Text(text = "${index + 1} : ${subItem.question}")
                                         Spacer(modifier = Modifier.height(8.dp))
 
                                         // Radio buttons for choices
@@ -188,20 +225,70 @@ fun UpdateScreen(
 
                                         }
                                     }
+
                                 }
 
 
                             }
                             // Calculate the sum of selected options
-                            val sum = selectedOptions.filter { it != -1 }.sum()
-                            Text(text = "Total Sum: $sum", fontWeight = FontWeight.Bold)
+                          //  val sum = selectedOptions.filter { it != -1 }.sum()
+                        //    Text(text = "Total Sum: $sum", fontWeight = FontWeight.Bold)
+                            Log.i("selected","Selce  ${selectedOptions.size}  ,   ${selectedOptions}")
+                            val countZero = selectedOptions.count { it == "0" }
+                            val countOne = selectedOptions.count { it == "1" }
+                            val countTwo = selectedOptions.count { it == "2" }
+                            val sumOne=countOne
+                            val sumTwo=countTwo*2
+                            val numberOfNa=selectedOptions.size-(countOne+countZero+countTwo)
+                            Log.d("ViewModel", "sumOne: $sumOne, sumTwo: $sumTwo")
+
+                            val sum = sumOne+sumTwo
+                            viewModel.onIncreaseZero(countZero)
+                            viewModel.onSize(selectedOptions.size)
+                            viewModel.onIncreaseOne(countOne)
+                            viewModel.onIncreaseNa(numberOfNa)
+                            viewModel.onIncreaseTwo(countTwo)
+                            zeroCounts.add(countZero)
+                            oneCounts.add(countOne)
+                            twoCounts.add(countTwo)
+                            naCounts.add(numberOfNa)
+                            totalSizes.add(selectedOptions.size)
+
+                       //     Text(text = "Total Sum:$sum Total Na:$numberOfNa   Total Zero : $countZero    Total One : $one   Total Two : $two", fontWeight = FontWeight.Bold)
 
                         }
 
 
+                    }/*نسبة االستيفاء ) %( = ) مجموع المستوفى (×100
+ مجموع االجراءات – عدد االجراءات التي ال تنطبق واالجراءات التي لم ترصد*/
 
+                    val sumZero = zeroCounts.sum()
+                    val sumOne = oneCounts.sum()
+                    val sumTwo = twoCounts.sum() * 2
+                    val sumNa = naCounts.sum()
+                    val totalSum = sumOne + sumTwo
+                    viewModel.onIncreaseZero(sumZero)
+                    viewModel.onSize(totalSizes.sum())
+                    viewModel.onIncreaseOne(sumOne)
+                    viewModel.onIncreaseNa(sumNa)
+                    viewModel.onIncreaseTwo(sumTwo)
+
+                    val sum = one+two
+                    var num=size-na
+                    if(num==0)num=1
+
+
+                    val score=(sum.toDouble()/num.toDouble())
+
+
+                    if(question!!.priority==1){
+                        question!!.priority=1
                     }
                     question!!.checkList = question!!.checkList
+                    question!!.dateAdded=question!!.dateAdded
+                    question!!.hospital=question!!.hospital
+                    question!!.name=question!!.name
+                    question!!.score=score
 
 
                 }
@@ -215,7 +302,7 @@ fun UpdateScreen(
 }
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun RadioButtonGroup(selectedOption: Int,viewModel:NotesViewModel, checkListItem :Item, index:Int, answer: Int ,onSelected: (Int) -> Unit) {
+fun RadioButtonGroup(selectedOption: String,viewModel:NotesViewModel, checkListItem :Item, index:Int, answer: String ,onSelected: (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -230,7 +317,7 @@ fun RadioButtonGroup(selectedOption: Int,viewModel:NotesViewModel, checkListItem
             ) {
 
                 RadioButton(
-                    selected = selectedOption == option,
+                    selected = selectedOption == option ||answer==option,
                     onClick = {
                         viewModel.updateSelectedOption(checkListItem, index, option)
                         onSelected(option)

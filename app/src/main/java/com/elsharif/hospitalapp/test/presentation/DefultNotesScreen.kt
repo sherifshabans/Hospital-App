@@ -43,7 +43,7 @@ import com.elsharif.hospitalapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotesScreenContent(
+fun DefultNotesScreen(
     state: QuestionState,
     navController: NavController,
     viewModel: NotesViewModel,
@@ -53,7 +53,7 @@ fun NotesScreenContent(
 
     Scaffold(
         topBar = {
-            /*Row(
+          /*  Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(55.dp)
@@ -72,7 +72,6 @@ fun NotesScreenContent(
 
             }*/
         },
-
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 state.checkList.value = ""
@@ -81,18 +80,16 @@ fun NotesScreenContent(
                 state.subItems.value = emptyList()
                 state.questionTitle.value = ""
                 state.question.value=""
-                state.answer.value=""
                 state.name.value=""
                 state.score.value=0.0
                 state.hospital.value=""
+                state.answer.value=""
                 navController.navigate("Start")
             }) {
                 Icon(imageVector = Icons.Rounded.Add, contentDescription = "Add new note")
             }
         }
     ) { paddingValues ->
-        Spacer(modifier = Modifier.height(15.dp))
-
         LazyColumn(
             contentPadding = paddingValues,
             modifier = Modifier
@@ -100,9 +97,8 @@ fun NotesScreenContent(
                 .padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
             items(state.notes.size) { index ->
-                NoteItem1(
+                NoteItem(
                     state = state,
                     index = index,
                     navController = navController,
@@ -110,32 +106,25 @@ fun NotesScreenContent(
                     onEvent=onEvent
                 )
             }
-
         }
-
     }
-
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NoteItem1(
+fun NoteItem(
     state: QuestionState,
     index: Int,
     navController: NavController,
     viewModel:NotesViewModel,
     onEvent: (NotesEvent) -> Unit,
-) {
-    Log.i("NoteItem", "itemcheck: ${state.notes[0].checkList}")
-
+    ) {
+   Log.i("NoteItem", "itemcheck: ${state.notes[0].checkList}")
     val id = state.notes[index].id
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp),
-
-        ){
-
+    ){
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -143,13 +132,10 @@ fun NoteItem1(
                 .background(MaterialTheme.colorScheme.primaryContainer)
                 .padding(12.dp),
 
-
             ) {
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-
-
                 val itemcheck = if (state.notes[index].checkList.isNotEmpty()) {
                     state.notes[index].checkList
                 } else {
@@ -172,20 +158,16 @@ fun NoteItem1(
                 }
                 val score = state.notes[index].score
 
-
-
                 Row (
                     modifier = Modifier
                         .padding(5.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
-
                 ) {
                     Text(
                         text = name,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color(0xFFFFA500)
-
                     )
                     Text(
                         text = ": اسم الجامعة ",
@@ -193,10 +175,7 @@ fun NoteItem1(
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.primary
                     )
-
-
                 }
-
                 Row (
                     modifier = Modifier
                         .padding(5.dp),
@@ -208,7 +187,6 @@ fun NoteItem1(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.Gray
-
                     )
                     Text(
                         text = ": اسم المستشفى ",
@@ -216,64 +194,50 @@ fun NoteItem1(
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.primary
                     )
-
-
                 }
                 Row (
                     modifier = Modifier
                         .padding(5.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
-
                 ) {
                     Text(
                         text = "%${score}",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.Gray
-
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = ": النسبة ",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.primary
                     )
-
-
                 }
-
                 Row (
                     modifier = Modifier
                         .padding(5.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween
 
                 ) {
                     Text(
                         text = "$itemcheck",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.Gray
+                                color = Color.Gray
 
                     )
-
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = " :عنصر التحقيق ",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.primary
                     )
-
-
                 }
-
-
-
-
-                Row (
+  Row (
                     modifier = Modifier
                         .padding(5.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.SpaceBetween
 
                 ) {
 
@@ -292,49 +256,59 @@ fun NoteItem1(
 
 
                 }
+            // Add IconButton for setting priority to one
+            Row (
+                modifier = Modifier
+                    .padding(5.dp)
+            ){
 
 
+            IconButton(
+                onClick = {
+                    viewModel.setPriorityToOne(state.notes[index]) // Set priority to one when clicked
+                },
+            ) {
 
+                Icon(
+                    imageVector = Icons.Rounded.Check,
+                    contentDescription = "تأكيد",
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+            IconButton(
+                   onClick = {
+                       onEvent(NotesEvent.DeleteNote(state.notes[index]))
+                   }
+               ) {
 
-                // Add IconButton for setting priority to one
-                Row (
-                    modifier = Modifier
-                        .padding(5.dp)
-                ){
+                   Icon(
+                       imageVector = Icons.Rounded.Delete,
+                       contentDescription = "حذف",
+                       modifier = Modifier.size(35.dp),
+                       tint = MaterialTheme.colorScheme.onPrimaryContainer
+                   )
 
-                    IconButton(
-                        onClick = {
-                            onEvent(NotesEvent.DeleteNote(state.notes[index]))
-                        }
-                    ) {
-
-                        Icon(
-                            imageVector = Icons.Rounded.Delete,
-                            contentDescription = "حذف",
-                            modifier = Modifier.size(35.dp),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
+               }
+                IconButton(
+                    onClick = {
+                        navController.navigate("update/$id")
 
                     }
-                    IconButton(
-                        onClick = {
-                            navController.navigate("update/$id")
+                ) {
 
-                        }
-                    ) {
-
-                        Icon(
-                            imageVector = Icons.Rounded.Edit,
-                            contentDescription = "تعديل",
-                            modifier = Modifier.size(35.dp),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-
-                    }
-
+                    Icon(
+                        imageVector = Icons.Rounded.Edit,
+                        contentDescription = "تعديل",
+                        modifier = Modifier.size(35.dp),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
 
                 }
+
+
             }
+}
         }
     }
 }
