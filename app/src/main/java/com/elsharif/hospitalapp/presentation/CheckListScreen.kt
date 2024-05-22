@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -123,9 +124,41 @@ fun CheckListScreen(
         ,
 
         floatingActionButton = {
+
             FloatingActionButton(onClick = {
                 state.hospital.value=argument3.toString()
                 state.name.value=argument2.toString()
+                var countZero = 0
+                var countOne = 0
+                var countTwo = 0
+                var countNa = 0
+
+                state.items.value.forEach {checkLists->
+                    checkLists.subItems.forEachIndexed { index, subItem ->
+                       // val selectedOption = getSelectedOptions(checkListItem, index)
+                        when (subItem.answer) {
+                            "0" -> countZero++
+                            "1" -> countOne++
+                            "2" -> countTwo++
+                            "N/A" -> countNa++
+
+                        }
+
+
+                    }
+                }
+
+                viewModel.onIncreaseZero(countZero)
+                viewModel.onIncreaseOne(countOne)
+                viewModel.onIncreaseTwo(countTwo)
+                viewModel.onIncreaseNa(countNa)
+
+                val sum = countOne + countTwo*2
+                val num = (countOne+countTwo+countZero)*2
+                val score = if (num == 0) 0.0 else sum.toDouble() / num.toDouble()
+
+                state.score.value=score.toDouble()
+ Log.i("the all ","$countZero  , $countOne ,  $countTwo  , $countNa")
                 val question = Question(
                     checkList = state.checkList.value,
                     items = state.items.value,
@@ -135,6 +168,8 @@ fun CheckListScreen(
                     hospital = state.hospital.value,
                     dateAdded = System.currentTimeMillis()
                 )
+
+
                 onEvent(NotesEvent.SaveNote(question))
                 navController.popBackStack()
             }) {
@@ -175,16 +210,17 @@ fun CheckListScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(
-                                    text = " ${checkListItem.title}",
-                                    fontWeight = FontWeight.Bold
-                                )
                                 IconButton(onClick = { isExpanded = !isExpanded }) {
                                     Icon(
                                         imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                                         contentDescription = null
                                     )
                                 }
+                                Text(
+                                    text = " ${checkListItem.title}",
+                                    fontWeight = FontWeight.Bold
+                                )
+
                             }
 
                             Spacer(modifier = Modifier.height(4.dp))
@@ -220,14 +256,16 @@ fun CheckListScreen(
 
                             }
 
+/*
                             val countZero = selectedOptions.count { it == "0" }
                             val countOne = selectedOptions.count { it == "1" }
                             val countTwo = selectedOptions.count { it == "2" }
                             val sumOne=countOne
                             val sumTwo=countTwo*2
                             val numberOfNa=selectedOptions.size-(countOne+countZero+countTwo)
+*/
 
-                            val sum = sumOne+sumTwo
+                          /*  val sum = sumOne+sumTwo
                             viewModel.onIncreaseZero(countZero)
                             viewModel.onSize(selectedOptions.size)
                             viewModel.onIncreaseOne(countOne)
@@ -238,33 +276,48 @@ fun CheckListScreen(
                             twoCounts.add(countTwo)
                             naCounts.add(numberOfNa)
                             totalSizes.add(selectedOptions.size)
-                          //  Text(text = "Total Sum:$sum Total Na:$numberOfNa  Total Zero : $countZero    Total One : $one   Total Two : $two", fontWeight = FontWeight.Bold)
+                          */
+                        //  Text(text = "Total Sum:$sum Total Na:$numberOfNa  Total Zero : $countZero    Total One : $one   Total Two : $two", fontWeight = FontWeight.Bold)
 
                         }
+/*
 
+                        val countZero = selectedOptions.count { it == "0" }
+                        val countOne = selectedOptions.count { it == "1" }
+                        val countTwo = selectedOptions.count { it == "2" }
+                        val countNa = selectedOptions.count { it == "N/A" }
+                        val sumZero = zeroCounts.sum()
+                        val sumOne = oneCounts.sum()
+                        val sumTwo = twoCounts.sum()
+                        val sumNa = naCounts.sum()
+                        viewModel.onIncreaseZero(countZero)
+                        //  viewModel.onSize(totalSizes.sum())
+                        viewModel.onIncreaseOne(countOne)
+                        viewModel.onIncreaseNa(countNa)
+                        viewModel.onIncreaseTwo(countTwo)
+
+                        Log.i("zz","$countZero ,  $countOne  ,$countTwo , $countNa ")
+                        Log.i("zz2","$zero ,  $one  ,$two , $na ")
+                        val sum = one+two
+                        var num=(one+two+zero)-na
+                        if(num==0)num=1
+                        val score=(sum.toDouble()/num.toDouble())
+
+                        state.score.value=score.toDouble()
+
+*/
 
                     }
-                    val sumZero = zeroCounts.sum()
-                    val sumOne = oneCounts.sum()
-                    val sumTwo = twoCounts.sum() * 2
-                    val sumNa = naCounts.sum()
-                    val totalSum = sumOne + sumTwo
-                    viewModel.onIncreaseZero(sumZero)
-                    viewModel.onSize(totalSizes.sum())
-                    viewModel.onIncreaseOne(sumOne)
-                    viewModel.onIncreaseNa(sumNa)
-                    viewModel.onIncreaseTwo(sumTwo)
-
-                    val sum = one+two
-                    var num=size-na
-                    if(num==0)num=1
-                    val score=(sum.toDouble()/num.toDouble())
-
-                    state.score.value=score.toDouble()
                     state.checkList.value = checkLists.checkList
                 }
+
+
             }
+
         }
+
+
+
     }
 }
 

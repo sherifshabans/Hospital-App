@@ -45,9 +45,9 @@ class NotesViewModel(
     private val _two=MutableStateFlow(0)
     var two=_two.asStateFlow()
 
-    fun onIncreaseZero(newZero:Int) {
+    fun onIncreaseZero(zeroValue:Int) {
 
-        _zero.value=newZero
+        _zero.value=zeroValue
     }
     fun onSize(new:Int) {
 
@@ -88,7 +88,10 @@ class NotesViewModel(
         _selectedOptionsMapState.value = _selectedOptionsMap.toMap()
     }
     fun getSelectedOptions(checkListItem: CheckListItem): List<String> {
-        return _selectedOptionsMap.getOrPut(checkListItem) { List(checkListItem.subItems.size) { "-1" } }
+        return _selectedOptionsMap.getOrPut(checkListItem) { List(checkListItem.subItems.size) { "" } }
+    }
+    fun getSelectedOptions(checkListItem: Item): List<String> {
+        return _selectedOptionsMap2.getOrPut(checkListItem) { List(checkListItem.subItems.size) { "" } }
     }
 
    fun updateSelectedOption(checkListItem: CheckListItem, index: Int, selectedOption: String) {
@@ -125,11 +128,10 @@ class NotesViewModel(
     private val _selectedOptionsMapState2 = MutableStateFlow(_selectedOptionsMap2.toMap())
     val selectedOptionsMapState2: StateFlow<Map<Item, List<String>>> get() = _selectedOptionsMapState2
 
-
     fun updateSelectedOption(checkListItem: Item, index: Int, selectedOption: String) {
-        _selectedOptionsMap2[checkListItem] = _selectedOptionsMap2[checkListItem]?.toMutableList()?.apply {
-            this[index] = selectedOption
-        } ?: List(checkListItem.subItems.size) { "" }
+        val updatedList = _selectedOptionsMap2[checkListItem]?.toMutableList() ?: MutableList(checkListItem.subItems.size) { "" }
+        updatedList[index] = selectedOption
+        _selectedOptionsMap2[checkListItem] = updatedList
         _selectedOptionsMapState2.value = _selectedOptionsMap2.toMap()
     }
 
@@ -150,11 +152,54 @@ class NotesViewModel(
 
 
     }
-    fun updateQuestion(question: Question) {
+    fun getSelectedOptions(checkListItem: Item, index: Int): String {
+        val selectedOptions = selectedOptionsMap2.value[checkListItem]
+        return selectedOptions?.getOrNull(index) ?: ""
+    }
+
+
+    fun updateQuestion(question: Question):Double {
+        var countZero = 0
+        var countOne = 0
+        var countTwo = 0
+        var countNa = 0
+        var totalCount = 0
+
+        question.items.forEach { checkListItem ->
+            checkListItem.subItems.forEachIndexed { index, subItem ->
+                val selectedOption = getSelectedOptions(checkListItem, index)
+                when (subItem.answer) {
+                    "0" -> countZero++
+                    "1" -> countOne++
+                    "2" -> countTwo++
+                    "N/A" -> countNa++
+
+                }
+
+
+            }
+        }
+        totalCount=countNa+countOne+countTwo+countZero
+
+        onIncreaseZero(countZero)
+        onIncreaseOne(countOne)
+        onIncreaseTwo(countTwo)
+        onIncreaseNa(countNa)
+        onSize(totalCount)
+
+        val sum = countOne + countTwo*2
+        val num = (countOne+countTwo+countZero) *2
+        val score = if (num == 0) 0.0 else sum.toDouble() / num.toDouble()
+
+
+        question.score = score
+
         viewModelScope.launch {
             dao.upsertQuestion(question)
         }
+    return score
     }
+
 
 
 

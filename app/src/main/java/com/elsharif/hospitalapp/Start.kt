@@ -33,52 +33,56 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 
 @Composable
 fun DropdownExample(
-    labelText: String,
-    items: List<String>,
-    paddingValue:PaddingValues
-):Pair<String,String> {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedItem by remember { mutableStateOf("") }
+        labelText: String,
+        items: List<String>,
+        paddingValue:PaddingValues
+):Pair<String,String>{
 
+        var expanded by remember { mutableStateOf(false) }
+        var selectedItem by remember { mutableStateOf("") }
 
     Row(
-        modifier=Modifier.padding(paddingValue),
+        modifier = Modifier.padding(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
-
     ) {
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
             items.forEach { item ->
-                DropdownMenuItem(onClick = {
-                    selectedItem = item
-                    expanded = false
-                },
+                DropdownMenuItem(
+                    onClick = {
+                        selectedItem = item
+                        expanded = false
+                    },
                     text = {
                         Text(text = item)
                     }
                 )
-
             }
         }
-
         IconButton(
-            onClick = { expanded = true }
+            onClick = { expanded = true },
+            modifier = Modifier.padding(8.dp)
         ) {
             Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Drop down")
         }
 
-        Text(labelText)
+        Text(selectedItem, modifier = Modifier.padding(8.dp), maxLines = 2)
 
+
+
+        Text(labelText,modifier=Modifier.padding(8.dp), maxLines = 2)
     }
-    return selectedItem to labelText
+
+        return selectedItem to labelText
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -153,6 +157,13 @@ fun StartScreen(
 
 
 
+                Column(
+                    modifier=Modifier.fillMaxWidth().padding(10.dp),
+                   verticalArrangement = Arrangement.Bottom,
+                    horizontalAlignment = Alignment.End
+                ) {
+
+
                 Button(onClick = {
                     if(selectedItem!=null &&selectedItem2!=null&&selectedItem3!=null){
 
@@ -168,10 +179,12 @@ fun StartScreen(
                     }
 
                 },
-                    modifier = Modifier.fillMaxWidth()) {
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)) {
                     Text(text = "التالي")
 
-                }
+                }}
             }
 
 

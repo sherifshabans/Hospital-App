@@ -79,7 +79,7 @@ fun UpdateScreen(
         onDispose {
             // Reset data in ViewModel when navigating away
             viewModel.resetValues()
-            viewModel.resetSelectedOptionsMap() // Reset the selectedOptionsMap when the screen is disposed
+           viewModel.resetSelectedOptionsMap() // Reset the selectedOptionsMap when the screen is disposed
 
         }
     }
@@ -173,7 +173,9 @@ fun UpdateScreen(
                 LazyColumn {
                     items(question!!.items) { checkListItem ->
 
+
                         val selectedOptions = selectedOptionsMapState[checkListItem] ?: List(checkListItem.subItems.size) { "" }
+                        Log.i("selectedOptions","selectedOptions :$selectedOptions")
                         val answers = viewModel.getAnswers(checkListItem)
                         var isExpanded by remember { mutableStateOf(false) }
 
@@ -183,25 +185,23 @@ fun UpdateScreen(
                                 .fillMaxWidth()
                                 .padding(8.dp)
                         ) {
-
-
-
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(
-                                    text = " ${checkListItem.title}",
-                                    fontWeight = FontWeight.Bold
-                                )
-
                                 IconButton(onClick = { isExpanded = !isExpanded }) {
                                     Icon(
                                         imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                                         contentDescription = null
                                     )
                                 }
+                                Text(
+                                    text = " ${checkListItem.title}",
+                                    fontWeight = FontWeight.Bold
+                                )
+
+
 
                             }
 
@@ -222,18 +222,38 @@ fun UpdateScreen(
                                         // Radio buttons for choices
                                         RadioButtonGroup(selectedOptions[index],viewModel ,checkListItem,index, subItem.answer) { selectedOption ->
                                             viewModel.updateAnswer(checkListItem, Answer(subItem.question, selectedOption))
-
                                         }
                                     }
 
                                 }
 
 
+
                             }
+                     /*       checkListItem.subItems.forEachIndexed { index, subItem ->
+
+
+                                if(subItem.answer=="0"){
+
+                                }
+                                else  if(subItem.answer=="1"){
+
+                                }
+                                else    if(subItem.answer=="2"){
+
+                                }
+                                else    if(subItem.answer=="N/A"){
+
+                                }
+
+
+                            }
+*/
                             // Calculate the sum of selected options
                           //  val sum = selectedOptions.filter { it != -1 }.sum()
                         //    Text(text = "Total Sum: $sum", fontWeight = FontWeight.Bold)
-                            Log.i("selected","Selce  ${selectedOptions.size}  ,   ${selectedOptions}")
+/*
+                            Log.i("selected","Selce  ${selectedOptions.size}  ,   $selectedOptions")
                             val countZero = selectedOptions.count { it == "0" }
                             val countOne = selectedOptions.count { it == "1" }
                             val countTwo = selectedOptions.count { it == "2" }
@@ -253,6 +273,7 @@ fun UpdateScreen(
                             twoCounts.add(countTwo)
                             naCounts.add(numberOfNa)
                             totalSizes.add(selectedOptions.size)
+*/
 
                        //     Text(text = "Total Sum:$sum Total Na:$numberOfNa   Total Zero : $countZero    Total One : $one   Total Two : $two", fontWeight = FontWeight.Bold)
 
@@ -261,6 +282,7 @@ fun UpdateScreen(
 
                     }/*نسبة االستيفاء ) %( = ) مجموع المستوفى (×100
  مجموع االجراءات – عدد االجراءات التي ال تنطبق واالجراءات التي لم ترصد*/
+/*
 
                     val sumZero = zeroCounts.sum()
                     val sumOne = oneCounts.sum()
@@ -280,6 +302,7 @@ fun UpdateScreen(
 
                     val score=(sum.toDouble()/num.toDouble())
 
+*/
 
                     if(question!!.priority==1){
                         question!!.priority=1
@@ -288,11 +311,9 @@ fun UpdateScreen(
                     question!!.dateAdded=question!!.dateAdded
                     question!!.hospital=question!!.hospital
                     question!!.name=question!!.name
-                    question!!.score=score
-
+                    question!!.score=question!!.score
 
                 }
-
             }
         }
 
@@ -309,7 +330,7 @@ fun RadioButtonGroup(selectedOption: String,viewModel:NotesViewModel, checkListI
             .padding(4.dp)
     ) {
 
-        viewModel.myList.value.forEach { option ->
+        viewModel.myList.collectAsState().value.forEach { option ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -170,7 +170,7 @@ fun NoteItem1(
                 }else {
                     "Not Found"
                 }
-                val score = state.notes[index].score
+                val score = state.notes[index].score*100
 
 
 

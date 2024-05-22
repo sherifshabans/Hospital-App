@@ -156,7 +156,8 @@ fun NoteItem(
                 }else {
                     "Not Found"
                 }
-                val score = state.notes[index].score
+
+                val score = state.notes[index].score*100
 
                 Row (
                     modifier = Modifier
