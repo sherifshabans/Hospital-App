@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.elsharif.hospitalapp.CheckList
 import com.elsharif.hospitalapp.CheckListItem
 import com.elsharif.hospitalapp.Login
 import com.elsharif.hospitalapp.dataofchecklist.Answer
@@ -99,10 +100,11 @@ class NotesViewModel(
           this[index] = selectedOption
       } ?: List(checkListItem.subItems.size) { "" }
       _selectedOptionsMapState.value = _selectedOptionsMap.toMap()
-    }
-    fun getAnswers(checkListItem: CheckListItem): List<Answer> {
+   }
+
+   fun getAnswers(checkListItem: CheckListItem): List<Answer> {
         return _answersMap.getOrPut(checkListItem) { mutableListOf() }
-    }
+   }
 
     fun updateAnswer(checkListItem: CheckListItem, answer: Answer) {
         val answers = _answersMap.getOrPut(checkListItem) { mutableListOf() }
@@ -114,8 +116,6 @@ class NotesViewModel(
         }
 
     }
-
-
 
 
     // for Update
@@ -228,6 +228,7 @@ class NotesViewModel(
             priority = mutableStateOf(0),
             questionTitle = mutableStateOf(""),
             name = mutableStateOf(""),
+            sub = mutableStateOf(""),
             hospital = mutableStateOf(""),
             subItems = mutableStateOf(emptyList()),
             question = mutableStateOf(""),
@@ -273,6 +274,7 @@ notes = completeNotes
                     items=state.value.items.value,
                     priority = state.value.priority.value,
                     name = state.value.name.value,
+                    sub = state.value.sub.value,
                     hospital = state.value.hospital.value,
                     score = state.value.score.value,
                     dateAdded = System.currentTimeMillis(),
@@ -290,6 +292,7 @@ notes = completeNotes
                         question = mutableStateOf(""),
                         answer = mutableStateOf(""),
                         name = mutableStateOf(""),
+                        sub = mutableStateOf(""),
                         hospital = mutableStateOf(""),
                         score = mutableStateOf(0.0),
 

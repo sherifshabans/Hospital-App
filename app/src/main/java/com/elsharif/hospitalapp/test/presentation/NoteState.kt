@@ -14,6 +14,7 @@ data class QuestionState(
     val defultNotes: List<Question> = emptyList(),
     val checkList: MutableState<String> = mutableStateOf(""),
     val name: MutableState<String> = mutableStateOf(""),
+    val sub: MutableState<String> = mutableStateOf(""),
     val hospital: MutableState<String> = mutableStateOf(""),
     val items: MutableState<List<Item>> = mutableStateOf(emptyList()),
     val questionTitle: MutableState<String> = mutableStateOf(""),

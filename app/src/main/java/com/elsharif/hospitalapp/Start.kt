@@ -27,10 +27,12 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.max
@@ -85,7 +87,7 @@ fun DropdownExample(
         return selectedItem to labelText
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
 @Composable
 fun StartScreen(
     navController: NavController
@@ -153,12 +155,32 @@ fun StartScreen(
                 val selectedItem3 = DropdownExample("اختر اسم المستشفى ", list3,it)
                 val selectedItem = DropdownExample("اختر عنصر التحقيق ", list1,it)
 
+                Spacer(modifier = Modifier.height(5.dp))
+
+
+                var textFieldValue by remember { mutableStateOf("") }
+
+                OutlinedTextField(
+                    value = textFieldValue,
+                    onValueChange = { textFieldValue = it },
+                    label = { Text(" القسم") },
+                    placeholder = { Text("اكتب القسم هنا") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                     //   .background(Color.Blue)
+                )
+
+
+
                 Spacer(modifier = Modifier.height(30.dp))
 
 
 
                 Column(
-                    modifier=Modifier.fillMaxWidth().padding(10.dp),
+                    modifier= Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
                    verticalArrangement = Arrangement.Bottom,
                     horizontalAlignment = Alignment.End
                 ) {
@@ -174,7 +196,7 @@ fun StartScreen(
                             selectedItem2.first
                         }/${
                             selectedItem3.first
-                        }"
+                        }/$textFieldValue"
                     )
                     }
 

@@ -161,7 +161,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     ///{argument2}/{argument3}/{argument4}
-                    composable("CheckListScreen/{argument}/{argument2}/{argument3}") {navBackStackEntry->
+                    composable("CheckListScreen/{argument}/{argument2}/{argument3}/{argument4}") {navBackStackEntry->
                         val argument = navBackStackEntry.arguments?.getString("argument")
                         val argument2 = navBackStackEntry.arguments?.getString("argument2")
                         val argument3 = navBackStackEntry.arguments?.getString("argument3")
@@ -175,7 +175,8 @@ class MainActivity : ComponentActivity() {
                             context = context,
                             argument = argument,
                             argument2 = argument2,
-                            argument3 = argument3
+                            argument3 = argument3,
+                            argument4 =argument4
 
                         )
                     }

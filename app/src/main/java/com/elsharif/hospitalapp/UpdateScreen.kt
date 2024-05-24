@@ -91,18 +91,6 @@ fun UpdateScreen(
     var question by remember { mutableStateOf<Question?>(null) }
 
 
-    val zero by viewModel.zero.collectAsState()
-    val na by viewModel.na.collectAsState()
-    val one by viewModel.one.collectAsState()
-    val two by viewModel.two.collectAsState()
-    val size by viewModel.size.collectAsState()
-
-    val zeroCounts = mutableListOf<Int>()
-    val oneCounts = mutableListOf<Int>()
-    val twoCounts = mutableListOf<Int>()
-    val naCounts = mutableListOf<Int>()
-    val totalSizes = mutableListOf<Int>()
-
      LaunchedEffect(questionId) {
         if (questionId != -1) {
             viewModel.getQuestionById(questionId).collect { fetchedQuestion ->
@@ -176,8 +164,7 @@ fun UpdateScreen(
 
                         val selectedOptions = selectedOptionsMapState[checkListItem] ?: List(checkListItem.subItems.size) { "" }
                         Log.i("selectedOptions","selectedOptions :$selectedOptions")
-                        val answers = viewModel.getAnswers(checkListItem)
-                        var isExpanded by remember { mutableStateOf(false) }
+                         var isExpanded by remember { mutableStateOf(false) }
 
 
                         Column(
@@ -230,80 +217,11 @@ fun UpdateScreen(
 
 
                             }
-                     /*       checkListItem.subItems.forEachIndexed { index, subItem ->
-
-
-                                if(subItem.answer=="0"){
-
-                                }
-                                else  if(subItem.answer=="1"){
-
-                                }
-                                else    if(subItem.answer=="2"){
-
-                                }
-                                else    if(subItem.answer=="N/A"){
-
-                                }
-
-
-                            }
-*/
-                            // Calculate the sum of selected options
-                          //  val sum = selectedOptions.filter { it != -1 }.sum()
-                        //    Text(text = "Total Sum: $sum", fontWeight = FontWeight.Bold)
-/*
-                            Log.i("selected","Selce  ${selectedOptions.size}  ,   $selectedOptions")
-                            val countZero = selectedOptions.count { it == "0" }
-                            val countOne = selectedOptions.count { it == "1" }
-                            val countTwo = selectedOptions.count { it == "2" }
-                            val sumOne=countOne
-                            val sumTwo=countTwo*2
-                            val numberOfNa=selectedOptions.size-(countOne+countZero+countTwo)
-                            Log.d("ViewModel", "sumOne: $sumOne, sumTwo: $sumTwo")
-
-                            val sum = sumOne+sumTwo
-                            viewModel.onIncreaseZero(countZero)
-                            viewModel.onSize(selectedOptions.size)
-                            viewModel.onIncreaseOne(countOne)
-                            viewModel.onIncreaseNa(numberOfNa)
-                            viewModel.onIncreaseTwo(countTwo)
-                            zeroCounts.add(countZero)
-                            oneCounts.add(countOne)
-                            twoCounts.add(countTwo)
-                            naCounts.add(numberOfNa)
-                            totalSizes.add(selectedOptions.size)
-*/
-
-                       //     Text(text = "Total Sum:$sum Total Na:$numberOfNa   Total Zero : $countZero    Total One : $one   Total Two : $two", fontWeight = FontWeight.Bold)
 
                         }
 
 
-                    }/*نسبة االستيفاء ) %( = ) مجموع المستوفى (×100
- مجموع االجراءات – عدد االجراءات التي ال تنطبق واالجراءات التي لم ترصد*/
-/*
-
-                    val sumZero = zeroCounts.sum()
-                    val sumOne = oneCounts.sum()
-                    val sumTwo = twoCounts.sum() * 2
-                    val sumNa = naCounts.sum()
-                    val totalSum = sumOne + sumTwo
-                    viewModel.onIncreaseZero(sumZero)
-                    viewModel.onSize(totalSizes.sum())
-                    viewModel.onIncreaseOne(sumOne)
-                    viewModel.onIncreaseNa(sumNa)
-                    viewModel.onIncreaseTwo(sumTwo)
-
-                    val sum = one+two
-                    var num=size-na
-                    if(num==0)num=1
-
-
-                    val score=(sum.toDouble()/num.toDouble())
-
-*/
-
+                    }
                     if(question!!.priority==1){
                         question!!.priority=1
                     }
@@ -311,6 +229,7 @@ fun UpdateScreen(
                     question!!.dateAdded=question!!.dateAdded
                     question!!.hospital=question!!.hospital
                     question!!.name=question!!.name
+                    question!!.sub=question!!.sub
                     question!!.score=question!!.score
 
                 }

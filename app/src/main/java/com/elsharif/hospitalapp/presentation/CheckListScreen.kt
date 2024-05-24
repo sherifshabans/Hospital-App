@@ -62,12 +62,10 @@ fun CheckListScreen(
     context: Context,
     argument: String?,
     argument2: String?,
-    argument3: String?
+    argument3: String?,
+    argument4: String?
 ) {
     val checkLists = CheckData.getCheckListByName(argument!!)
-    val subitems = remember { mutableStateListOf<Item>() }
-    var isExpanded by remember { mutableStateOf(false) }
-    //val selectedOptionsMap by viewModel.selectedOptionsMap.collectAsState()
 
 
     val selectedOptionsMapState by viewModel.selectedOptionsMapState.collectAsState()
@@ -81,20 +79,6 @@ fun CheckListScreen(
 
         }
     }
-
-
-    val zero by viewModel.zero.collectAsState()
-    val na by viewModel.na.collectAsState()
-    val one by viewModel.one.collectAsState()
-    val two by viewModel.two.collectAsState()
-    val size by viewModel.size.collectAsState()
-
-
-    val zeroCounts = mutableListOf<Int>()
-    val oneCounts = mutableListOf<Int>()
-    val twoCounts = mutableListOf<Int>()
-    val naCounts = mutableListOf<Int>()
-    val totalSizes = mutableListOf<Int>()
 
 
     Scaffold(
@@ -128,6 +112,8 @@ fun CheckListScreen(
             FloatingActionButton(onClick = {
                 state.hospital.value=argument3.toString()
                 state.name.value=argument2.toString()
+                state.sub.value=argument4.toString()
+
                 var countZero = 0
                 var countOne = 0
                 var countTwo = 0
@@ -135,13 +121,11 @@ fun CheckListScreen(
 
                 state.items.value.forEach {checkLists->
                     checkLists.subItems.forEachIndexed { index, subItem ->
-                       // val selectedOption = getSelectedOptions(checkListItem, index)
                         when (subItem.answer) {
                             "0" -> countZero++
                             "1" -> countOne++
                             "2" -> countTwo++
                             "N/A" -> countNa++
-
                         }
 
 
@@ -158,12 +142,13 @@ fun CheckListScreen(
                 val score = if (num == 0) 0.0 else sum.toDouble() / num.toDouble()
 
                 state.score.value=score.toDouble()
- Log.i("the all ","$countZero  , $countOne ,  $countTwo  , $countNa")
+          Log.i("the all ","$countZero  , $countOne ,  $countTwo  , $countNa")
                 val question = Question(
                     checkList = state.checkList.value,
                     items = state.items.value,
                     priority = state.priority.value,
                     name = state.name.value,
+                    sub = state.sub.value,
                     score = state.score.value,
                     hospital = state.hospital.value,
                     dateAdded = System.currentTimeMillis()
@@ -196,9 +181,7 @@ fun CheckListScreen(
 
 
                         val selectedOptions = selectedOptionsMapState[checkListItem] ?: List(checkListItem.subItems.size) { "" }
-                        val answers = viewModel.getAnswers(checkListItem)
                         var isExpanded by remember { mutableStateOf(false) }
-                        var value by remember { mutableStateOf(0)}
 
                         Column(
                             modifier = Modifier
@@ -239,73 +222,37 @@ fun CheckListScreen(
                                                 viewModel.updateAnswer(checkListItem, Answer(subItem, selectedOption))
                                             Log.d("Composable", "Selected option for $checkListItem: $selectedOption")
                                             Log.d("Composable", "Updated answer for $checkListItem: ${viewModel.getAnswers(checkListItem)}")
-
                                         }
+
                                     }
                                 }
 
 
                                 // Update state.items.value after iterating over all subitems
+
                                 val updatedItems = checkLists.items.map { item ->
-                                    Item(item.title, viewModel.getAnswers(item))
+                                    // Get the existing answers for the item
+                                    val existingAnswers = viewModel.getAnswers(item)
+
+                                    val updatedAnswers = item.subItems.map { subItem ->
+                                        // Check if the subItem's question is already in the existing answers
+                                        val existingAnswer = existingAnswers.find { it.question == subItem }
+                                        if (existingAnswer == null) {
+                                            // If not found, create a new Answer with an empty string
+                                            Answer(subItem, "")
+                                        } else {
+                                            // If found, use the existing answer
+                                            existingAnswer
+                                        }
+                                    }
+
+                                    Item( item.title, updatedAnswers)
                                 }
                                 state.items.value = updatedItems
-                               // subitems.clear()
-                                //subitems.add(Item(checkListItem.title, answers))
-                                //state.items.value = subitems
 
                             }
 
-/*
-                            val countZero = selectedOptions.count { it == "0" }
-                            val countOne = selectedOptions.count { it == "1" }
-                            val countTwo = selectedOptions.count { it == "2" }
-                            val sumOne=countOne
-                            val sumTwo=countTwo*2
-                            val numberOfNa=selectedOptions.size-(countOne+countZero+countTwo)
-*/
-
-                          /*  val sum = sumOne+sumTwo
-                            viewModel.onIncreaseZero(countZero)
-                            viewModel.onSize(selectedOptions.size)
-                            viewModel.onIncreaseOne(countOne)
-                            viewModel.onIncreaseNa(numberOfNa)
-                            viewModel.onIncreaseTwo(countTwo)
-                            zeroCounts.add(countZero)
-                            oneCounts.add(countOne)
-                            twoCounts.add(countTwo)
-                            naCounts.add(numberOfNa)
-                            totalSizes.add(selectedOptions.size)
-                          */
-                        //  Text(text = "Total Sum:$sum Total Na:$numberOfNa  Total Zero : $countZero    Total One : $one   Total Two : $two", fontWeight = FontWeight.Bold)
-
                         }
-/*
-
-                        val countZero = selectedOptions.count { it == "0" }
-                        val countOne = selectedOptions.count { it == "1" }
-                        val countTwo = selectedOptions.count { it == "2" }
-                        val countNa = selectedOptions.count { it == "N/A" }
-                        val sumZero = zeroCounts.sum()
-                        val sumOne = oneCounts.sum()
-                        val sumTwo = twoCounts.sum()
-                        val sumNa = naCounts.sum()
-                        viewModel.onIncreaseZero(countZero)
-                        //  viewModel.onSize(totalSizes.sum())
-                        viewModel.onIncreaseOne(countOne)
-                        viewModel.onIncreaseNa(countNa)
-                        viewModel.onIncreaseTwo(countTwo)
-
-                        Log.i("zz","$countZero ,  $countOne  ,$countTwo , $countNa ")
-                        Log.i("zz2","$zero ,  $one  ,$two , $na ")
-                        val sum = one+two
-                        var num=(one+two+zero)-na
-                        if(num==0)num=1
-                        val score=(sum.toDouble()/num.toDouble())
-
-                        state.score.value=score.toDouble()
-
-*/
 
                     }
                     state.checkList.value = checkLists.checkList

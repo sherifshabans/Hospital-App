@@ -18,6 +18,7 @@ data class Question(
     var items: List<Item>,
     var name:String,
     var hospital:String,
+    var sub:String,
     var priority: Int,
     var dateAdded: Long,
     var score:Double,

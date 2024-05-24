@@ -83,6 +83,7 @@ fun NotesScreenContent(
                 state.question.value=""
                 state.answer.value=""
                 state.name.value=""
+                state.sub.value=""
                 state.score.value=0.0
                 state.hospital.value=""
                 navController.navigate("Start")
@@ -170,6 +171,12 @@ fun NoteItem1(
                 }else {
                     "Not Found"
                 }
+                val sub = if(state.notes[index].sub.isNotEmpty()){
+                    state.notes[index].sub
+                }else {
+                    "Not Found"
+                }
+
                 val score = state.notes[index].score*100
 
 
@@ -293,7 +300,28 @@ fun NoteItem1(
 
                 }
 
+                Row (
+                    modifier = Modifier
+                        .padding(5.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
 
+                ) {
+
+                    Text(
+                        text = sub,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.DarkGray
+                    )
+                    Text(
+                        text = ": القسم ",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+
+                }
 
 
                 // Add IconButton for setting priority to one

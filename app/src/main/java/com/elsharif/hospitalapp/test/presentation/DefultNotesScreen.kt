@@ -81,6 +81,7 @@ fun DefultNotesScreen(
                 state.questionTitle.value = ""
                 state.question.value=""
                 state.name.value=""
+                state.sub.value=""
                 state.score.value=0.0
                 state.hospital.value=""
                 state.answer.value=""
@@ -153,6 +154,11 @@ fun NoteItem(
                 }
                 val hospital = if(state.notes[index].hospital.isNotEmpty()){
                     state.notes[index].hospital
+                }else {
+                    "Not Found"
+                }
+                val sub = if(state.notes[index].sub.isNotEmpty()){
+                    state.notes[index].sub
                 }else {
                     "Not Found"
                 }
@@ -235,7 +241,7 @@ fun NoteItem(
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
-  Row (
+                Row (
                     modifier = Modifier
                         .padding(5.dp),
                             horizontalArrangement = Arrangement.SpaceBetween
@@ -250,6 +256,28 @@ fun NoteItem(
                     )
                     Text(
                         text = ": التاريخ ",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+
+                }
+                Row (
+                    modifier = Modifier
+                        .padding(5.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+
+                ) {
+
+                    Text(
+                        text = sub,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.DarkGray
+                    )
+                    Text(
+                        text = ": القسم ",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.primary
